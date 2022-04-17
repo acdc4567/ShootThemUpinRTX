@@ -9,5 +9,12 @@ public class ShootThemUp : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+
+		PublicIncludePaths.AddRange(new string[] { 
+		"ShootThemUp/Public/Player"
+		,"ShootThemUp/Public/Components"
+		,"ShootThemUp/Public/Dev"
+		});
+	
 	}
 }
