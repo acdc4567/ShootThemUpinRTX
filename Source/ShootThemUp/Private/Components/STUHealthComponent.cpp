@@ -3,8 +3,8 @@
 
 #include "Components/STUHealthComponent.h"
 #include "GameFramework/Actor.h"
-#include "Dev/STUFireDamageType.h"
-#include "Dev/STIIceDamageType.h"
+#include "Engine/World.h"
+#include "TimerManager.h"
 
 
 
@@ -23,7 +23,7 @@ void USTUHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Health = MaxHealth;
+	SetHealth(MaxHealth);
 
 	AActor* ComponentOwner = GetOwner();
 	if (ComponentOwner) {
@@ -36,17 +36,35 @@ void USTUHealthComponent::BeginPlay()
 
 }
 void USTUHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser) {
-	Health -= Damage;
-	
-	if (DamageType) {
-		if (DamageType->IsA<USTUFireDamageType>()) {
-			//UE_LOG(LogTemp, Warning, TEXT("SoHot!!!"));
-		}
-		else if (DamageType->IsA<USTIIceDamageType>()) {
-			//UE_LOG(LogTemp, Warning, TEXT("SoCold!!!"));
-
-		}
+	if (Damage <= 0.f || IsDead()||!GetWorld())return;
+	SetHealth(Health - Damage);
+	GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
+	if (IsDead()) {
+		OnDeath.Broadcast();
 	}
+	else if (bAutoHeal) {
+		GetWorld()->GetTimerManager().SetTimer(HealTimerHandle,this,&USTUHealthComponent::HealUpdate,HealUpdateTime,1,HealDelay);
+
+
+	}
+	
+
+
+
+}
+
+void USTUHealthComponent::HealUpdate(){
+	SetHealth(Health + HealModifier);
+	if (FMath::IsNearlyEqual(Health,MaxHealth) && GetWorld()) {
+		GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
+	}
+
+}
+
+void USTUHealthComponent::SetHealth(float NewHealth){
+	Health = FMath::Clamp(NewHealth, 0.f, MaxHealth);
+
+	OnHealthChanged.Broadcast(Health);
 
 
 

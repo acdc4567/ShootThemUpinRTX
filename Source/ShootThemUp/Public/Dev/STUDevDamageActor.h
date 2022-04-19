@@ -23,10 +23,10 @@ public:
 		float Radius = 300.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float Damage = 3.f;
+		float Damage = .3f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool DoFullDamage = 1;
+		bool DoFullDamage = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FColor SphereColor = FColor::Cyan;
