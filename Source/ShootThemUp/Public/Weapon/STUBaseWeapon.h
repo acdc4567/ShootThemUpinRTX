@@ -14,6 +14,7 @@ class USkeletalMeshComponent;
 
 
 
+
 UCLASS()
 class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 {
@@ -31,6 +32,17 @@ public:
 	bool CanReload() const;
 
 	FOnClipEmptySignature OnClipEmpty;
+
+	FWeaponUIData GetUIData() const { return UIData; }
+	FAmmoData GetAmmoData() const { return CurrentAmmo; }
+
+	bool TryToAddAmmo(int32 ClipsAmount);
+
+	void SpawnMuzzleEffects();
+
+
+	bool IsAmmoEmpty() const;
+
 
 
 protected:
@@ -56,7 +68,9 @@ protected:
 	void MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd);
 
 	
-	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = VFX)
+		UParticleSystem* MuzzleParticles;
+
 
 	UPROPERTY(EditAnywhere, Category = Weapon)
 		float TraceMaxDistance = 50000.f;
@@ -65,10 +79,12 @@ protected:
 		FName MuzzleSocketName = "MuzzleFlashSocket";
 
 	void DecreaseAmmo();
-	bool IsAmmoEmpty() const;
 	bool IsClipEmpty() const;
-	
+	bool IsAmmoFull() const;
 	void LogAmmo();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+		FWeaponUIData UIData;
 
 
 private:	

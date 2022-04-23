@@ -6,6 +6,10 @@
 #include "Weapon/STUBaseWeapon.h"
 #include "STURifleWeapon.generated.h"
 
+
+class USTUWeaponFXComponent;
+class UParticleSystemComponent;
+
 /**
  * 
  */
@@ -16,10 +20,16 @@ class SHOOTTHEMUP_API ASTURifleWeapon : public ASTUBaseWeapon
 	
 
 public:
+
+	ASTURifleWeapon();
+
+
 	virtual void StartFire() override;
 	virtual void StopFire() override;
+	void SetMuzzleFXVisibility(bool Visible);
 
 protected:
+	virtual void BeginPlay() override;
 
 	virtual void MakeShot() override;
 
@@ -37,6 +47,25 @@ protected:
 		float DamageAmount = 10.f;
 
 
+	UPROPERTY(VisibleAnywhere, Category = VFX)
+		USTUWeaponFXComponent* WeaponFXComponent;
+
+	UPROPERTY(EditDefaultsOnly,  BlueprintReadWrite,Category = VFX)
+		UParticleSystem* RifleMuzzleParticles;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = VFX)
+		UParticleSystem* RifleTraceParticles;
+
+	UPROPERTY(VisibleAnywhere, Category = VFX)
+		UParticleSystemComponent* MuzzleVFX;
+
+	FVector TraceFXEnd;
+
+	UPROPERTY(VisibleAnywhere, Category = VFX)
+		UParticleSystemComponent* TraceVFX;
+
+
+	FHitResult HitRut;
 private:
 
 	FTimerHandle ShotTimerHandle;

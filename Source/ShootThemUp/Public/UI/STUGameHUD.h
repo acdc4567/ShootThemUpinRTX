@@ -6,6 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "STUGameHUD.generated.h"
 
+
+class UUserWidget;
 /**
  * 
  */
@@ -19,6 +21,19 @@ public:
 
 	virtual void DrawHUD() override;
 
+
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+		TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
+
+
+
 private:
 	void DrawCrossHair();
+
+
+
+
 };

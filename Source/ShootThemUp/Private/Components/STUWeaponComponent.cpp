@@ -195,6 +195,41 @@ void USTUWeaponComponent::InitAnimations(){
 
 }
 
+bool USTUWeaponComponent::GetCurrentWeaponUIData(FWeaponUIData& UIData) const{
+	if (CurrentWeapon) {
+		UIData = CurrentWeapon->GetUIData();
+		return 1;
+
+	}
+	return 0;
+}
+
+bool USTUWeaponComponent::GetCurrentWeaponAmmoData(FAmmoData& AmmoData) const{
+	if (CurrentWeapon) {
+		AmmoData = CurrentWeapon->GetAmmoData();
+		return 1;
+
+	}
+	return 0;
+}
+
+bool USTUWeaponComponent::TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount){
+
+	for (const auto Weapon:Weapons) {
+		if (Weapon && Weapon->IsA(WeaponType)) {
+			return Weapon->TryToAddAmmo(ClipsAmount);
+
+		}
+	}
+
+
+	return false;
+}
+
+
+
+
+
 void USTUWeaponComponent::OnEquipFinished(USkeletalMeshComponent* MeshComp){
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
 	if (!Character || MeshComp != Character->GetMesh())return;
@@ -235,9 +270,18 @@ bool USTUWeaponComponent::CanReload() const {
 	return CurrentWeapon && !bEquipAnimInProgress && !bReloadAnimInProgress && CurrentWeapon->CanReload();;
 }
 
-void USTUWeaponComponent::OnEmptyClip(){
-
-	ChangeClip();
+void USTUWeaponComponent::OnEmptyClip(ASTUBaseWeapon* AmmoEmptyWeapon){
+	if (!AmmoEmptyWeapon)return;
+	if (CurrentWeapon == AmmoEmptyWeapon) {
+		ChangeClip();
+	}
+	else {
+		for (const auto Weapon:Weapons) {
+			if (Weapon==AmmoEmptyWeapon) {
+				Weapon->ChangeClip();
+			}
+		}
+	}
 }
 
 void USTUWeaponComponent::ChangeClip(){

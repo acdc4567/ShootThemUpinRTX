@@ -8,7 +8,7 @@ public class ShootThemUp : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay","Niagara" ,"PhysicsCore","GameplayTasks","NavigationSystem"});
 
 		PublicIncludePaths.AddRange(new string[] { 
 		"ShootThemUp/Public/Player"
@@ -17,6 +17,12 @@ public class ShootThemUp : ModuleRules
 		,"ShootThemUp/Public/Weapon"
 		,"ShootThemUp/Public/UI"
 		,"ShootThemUp/Public/Animation"
+		,"ShootThemUp/Public/Pickups"
+		,"ShootThemUp/Public/Weapon/Components"
+		,"ShootThemUp/Public/AI"
+		,"ShootThemUp/Public/AI/Tasks"
+		,"ShootThemUp/Public/AI/Services"
+		,"ShootThemUp/Public/AI/EQS"
 		});
 	
 	}

@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class UProjectileMovementComponent;
+class USTUWeaponFXComponent;
 
 
 UCLASS()
@@ -16,7 +17,7 @@ class SHOOTTHEMUP_API ASTUProjectile : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+
 	ASTUProjectile();
 
 
@@ -24,7 +25,8 @@ public:
 
 
 protected:
-	// Called when the game starts or when spawned
+	
+
 	virtual void BeginPlay() override;
 
 
@@ -45,6 +47,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 		float LifeSeconds = 5.f;
+
+
+	UPROPERTY(VisibleAnywhere, Category = VFX)
+		USTUWeaponFXComponent* WeaponFXComponent;
+
 
 private:
 	FVector ShotDirection;

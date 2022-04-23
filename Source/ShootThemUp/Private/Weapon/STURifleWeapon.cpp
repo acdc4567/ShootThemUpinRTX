@@ -4,19 +4,64 @@
 #include "Weapon/STURifleWeapon.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "Weapon/Components/STUWeaponFXComponent.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
+
+
+ASTURifleWeapon::ASTURifleWeapon() {
+
+	WeaponFXComponent = CreateDefaultSubobject<USTUWeaponFXComponent>("WeaponFXComponent");
+	
+	
+
+}
+
+
+
+void ASTURifleWeapon::BeginPlay() {
+	Super::BeginPlay();
+	check(WeaponFXComponent);
+
+	if (RifleMuzzleParticles)
+		MuzzleVFX = UGameplayStatics::SpawnEmitterAttached(RifleMuzzleParticles, WeaponMesh, MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator);
+
+	
+	SetMuzzleFXVisibility(0);
+
+}
+
+
+
 
 
 void ASTURifleWeapon::StartFire(){
-	
+	SetMuzzleFXVisibility(1);
 	GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTURifleWeapon::MakeShot, TimeBetweenShots, 1);
 	MakeShot();
 
 }
 
 void ASTURifleWeapon::StopFire(){
-
+	SetMuzzleFXVisibility(0);
 	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
 }
+
+void ASTURifleWeapon::SetMuzzleFXVisibility(bool Visible){
+	
+	
+
+	if (MuzzleVFX && RifleMuzzleParticles && RifleTraceParticles &&Visible) {
+		MuzzleVFX = UGameplayStatics::SpawnEmitterAttached(RifleMuzzleParticles, WeaponMesh, MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator);
+		TraceVFX= UGameplayStatics::SpawnEmitterAttached(RifleTraceParticles, WeaponMesh, MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator);
+		TraceVFX->SetVectorParameter(FName("ShockBeamEnd"), TraceFXEnd);
+	}
+	else	if (MuzzleVFX && !Visible) {
+		MuzzleVFX->DeactivateSystem();
+	}
+}
+
+
 
 void ASTURifleWeapon::MakeShot(){
 
@@ -35,18 +80,24 @@ void ASTURifleWeapon::MakeShot(){
 	FHitResult HitResult;
 	MakeHit(HitResult, TraceStart, TraceEnd);
 
+	TraceFXEnd = TraceEnd;
+
 	if (HitResult.bBlockingHit) {
-
+		TraceFXEnd = HitResult.ImpactPoint;
 		MakeDamage(HitResult);
-		DrawDebugLine(GetWorld(), GetMuzzleWorldLocation(), HitResult.ImpactPoint, FColor::Red, 0, 3.f, 0, 3.f);
-
-		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.f, 24, FColor::Green, 0, .5f);
+		
+		WeaponFXComponent->PlayImpactFX(HitResult);
+		
+		//WeaponFXComponent->HitResultData(HitResult,HitRut);
+	
 	}
 	else {
-		DrawDebugLine(GetWorld(), GetMuzzleWorldLocation(), TraceEnd, FColor::Red, 0, 3.f, 0, 3.f);
+		
 
 	}
 	DecreaseAmmo();
+	
+
 }
 
 bool ASTURifleWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const {
@@ -68,4 +119,7 @@ void ASTURifleWeapon::MakeDamage(const FHitResult& HitResult) {
 	if (!DamagedActor)return;
 	DamagedActor->TakeDamage(DamageAmount, FDamageEvent(), GetPlayerController(), this);
 }
+
+
+
 
